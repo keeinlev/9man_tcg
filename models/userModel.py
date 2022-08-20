@@ -1,6 +1,6 @@
 from flask_login import UserMixin
 from app import db
-from models.collectibleCardModel import CollectibleCard
+from models.cardModel import Card
 
 class User(UserMixin, db.Model):
     __tablename__="users"
@@ -26,4 +26,4 @@ class User(UserMixin, db.Model):
 
     @property
     def user_cards(self):
-        return CollectibleCard.query.filter_by(owner_user=self.username)
+        return Card.query.filter_by(owner=self.username)

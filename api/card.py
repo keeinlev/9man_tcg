@@ -2,10 +2,10 @@ from flask import request, json
 from flask_login import current_user
 from app import app, db, BASE_URL as base_url, STATIC_URL as static_url
 from auth import validate_email_pass
-from models.cardModel import Card
+from models.cardTemplateModel import CardTemplate
 
 @app.route("/card", methods=['GET', 'POST'])
-def card_get_post():
+def card_template_get_post():
     if request.method == "POST":
         data = None
         if request.data:
@@ -39,14 +39,14 @@ def card_get_post():
         conn = db.engine.raw_connection()
         cursor = conn.cursor()
         query = """
-        INSERT INTO cards 
+        INSERT INTO card_templates 
             (name, team, year, collection, image_url, rarity) 
         VALUES 
             (?, ?, ?, ?, ?, ?) 
         RETURNING id;
         """
         result = cursor.execute(query, params).fetchall()[0]
-        #result = db.engine.execute("INSERT INTO cards (name, team, year, collection, image_url) VALUES (\"Kevin Lee\", \"TUV\", 2022, \"TUV Mini\", \"none\");")
+        #result = db.engine.execute("INSERT INTO card_templates (name, team, year, collection, image_url) VALUES (\"Kevin Lee\", \"TUV\", 2022, \"TUV Mini\", \"none\");")
         conn.commit()
         cursor.close()
         conn.close()
@@ -56,13 +56,16 @@ def card_get_post():
             "id": result[0]
         }
     elif request.method == "GET":
-        card_id = request.args.get('id', None)
-        if card_id is None:
+        template_id = request.args.get('id', None)
+        if template_id is None:
             return {"status": "failed", "message": "Card with specified ID could not be found"}
-        got_card = Card.query.get(card_id)
+        got_card = CardTemplate.query.get(template_id)
         if got_card:
-            return {"status": "success", "name": Card.query.get(card_id).name}
+            return {"status": "success", "name": CardTemplate.query.get(template_id).name}
         else:
             return {"status": "failed", "message": "Card with specified ID could not be found"}
     else:
         return {"status": "failed", "message": "Request method not supported"}
+
+# @app.route("")
+# def create_card()

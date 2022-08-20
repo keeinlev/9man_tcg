@@ -18,8 +18,8 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-from models.cardModel import Card
-target_metadata = Card.metadata
+from models.cardTemplateModel import CardTemplate
+target_metadata = CardTemplate.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

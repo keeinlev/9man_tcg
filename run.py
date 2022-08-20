@@ -1,6 +1,6 @@
 from flask import render_template
+from models.cardTemplateModel import CardTemplate
 from models.cardModel import Card
-from models.collectibleCardModel import CollectibleCard
 from models.packModel import Pack
 from models.tradeModel import Trade
 from app import app, db
