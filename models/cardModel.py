@@ -1,4 +1,5 @@
 from app import db
+from models.cardTemplateModel import CardTemplate
 
 class Card(db.Model):
     __tablename__ = "cards"
@@ -7,3 +8,7 @@ class Card(db.Model):
     owner = db.Column(db.String(100), nullable=False) # username
     date_created = db.Column(db.DateTime, nullable=False)
     date_received = db.Column(db.DateTime, nullable=False)
+
+    @property
+    def name(self):
+        return CardTemplate.query.get(self.template_id).name
