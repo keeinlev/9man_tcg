@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="title">
+    9 Man Trading Card Community
+</h1>
+<h2 class="subtitle">
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <div class="notification is-danger">
+            {{ messages[0] }}
+        </div>
+    {% endif %}
+    {% endwith %}
+    <u><a href="{{ url_for('auth.signup') }}">Sign up now</a></u>
+</h2>
+{% endblock %}
