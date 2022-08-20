@@ -10,3 +10,4 @@ class CardTemplate(db.Model):
     collection = db.Column(db.String(50), nullable=False, default=str(datetime.now().year) + " Season")
     rarity = db.Column(db.Integer, nullable=False)
     image_url = db.Column(db.String(250), nullable=False)
+    __table_args__ = (db.UniqueConstraint('name', 'team', 'year', 'collection'),)

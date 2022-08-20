@@ -30,6 +30,17 @@ def validate_email_pass(email, password):
         return 0
     return got_user
 
+def authorized_request(data):
+    """
+    Given request data return True if valid admin credentials are given or admin is logged in and False otherwise
+    """
+    got_user = User.query.get(current_user.get_id())
+    if (data.get("email", None) is not None and data.get("password", None) is not None):
+        got_user = validate_email_pass(data.get("email", None), data.get("password", None))
+    if ((not got_user and not current_user.is_authenticated) or not got_user.is_admin):
+        return False
+    return True
+
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == "GET":

@@ -9,6 +9,10 @@ from api.profile import *
 from auth import *
 
 db.create_all()
+from auth import auth as auth_blueprint
+app.register_blueprint(auth_blueprint, url_prefix="/auth")
+from api.card import card_bp as card_blueprint
+app.register_blueprint(card_blueprint, url_prefix="/card")
 
 @app.route("/")
 def home():

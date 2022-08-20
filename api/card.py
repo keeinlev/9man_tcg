@@ -1,59 +1,56 @@
-from flask import request, json
+from flask import Blueprint, request, json
 from flask_login import current_user
+from sqlalchemy.exc import OperationalError, IntegrityError
+from datetime import datetime
 from app import app, db, BASE_URL as base_url, STATIC_URL as static_url
-from auth import validate_email_pass
+from auth import authorized_request
 from models.cardTemplateModel import CardTemplate
+from models.cardModel import Card
 
-@app.route("/card", methods=['GET', 'POST'])
+card_bp = Blueprint('card', __name__)
+
+@card_bp.route("/template", methods=['GET', 'POST'])
 def card_template_get_post():
     if request.method == "POST":
         data = None
         if request.data:
-            print("using data")
-            data = json.loads(request.data) # maybe use request.form if this is going to be on an interface
+            data = json.loads(request.data)
         elif request.form:
-            print("using form")
             data = request.form
         else:
             return {"status": "failed", "message": "No arguments given"}
 
-        if (data.get("email", None) is not None and data.get("password", None) is not None):
-            got_user = validate_email_pass(data.get("email", None), data.get("password", None))
-        if not ((current_user.is_authenticated and current_user.is_admin) or (got_user and got_user.is_admin)):
+        if not authorized_request(data):
             return {"status": "failed", "message": "User is not authorized to perform this action."}
-        params = (
-            data.get("name", None),
-            data.get("team", None),
-            data.get("year", 2022),
-            data.get("collection", "2022 Season"),
-            data.get("image_url", static_url + "/images/null.png"),
-            data.get("rarity", None),
-        )
-        if params[0] is None:
+
+        params = {
+            "name": data.get("name", None),
+            "team": data.get("team", None),
+            "year": data.get("year", 2022),
+            "collection": data.get("collection", "2022 Season"),
+            "image_url": data.get("image_url", static_url + "/images/null.png"),
+            "rarity": data.get("rarity", None),
+        }
+        if params["name"] is None:
             return {"status": "failed", "message": "Missing required fields 'name'"}
-        elif params[1] is None:
+        elif params["team"] is None:
             return {"status": "failed", "message": "Missing required fields 'team'"}
-        elif params[5] is None:
+        elif params["image_url"] is None:
             return {"status": "failed", "message": "Missing required fields 'rarity'"}
 
-        conn = db.engine.raw_connection()
-        cursor = conn.cursor()
-        query = """
-        INSERT INTO card_templates 
-            (name, team, year, collection, image_url, rarity) 
-        VALUES 
-            (?, ?, ?, ?, ?, ?) 
-        RETURNING id;
-        """
-        result = cursor.execute(query, params).fetchall()[0]
-        #result = db.engine.execute("INSERT INTO card_templates (name, team, year, collection, image_url) VALUES (\"Kevin Lee\", \"TUV\", 2022, \"TUV Mini\", \"none\");")
-        conn.commit()
-        cursor.close()
-        conn.close()
+        try:
+            new_template = CardTemplate(**params)
+            db.session.add(new_template)
+            db.session.commit()
+        except IntegrityError:
+            return {"status": "failed", "message": "Card with that name, team, year, collection combination already exists"}
+        except OperationalError:
+            return {"status": "failed", "message": "Database OperationalError"}
+
         return {
             "status": "success",
             "message": "New player card created", 
-            "id": result[0]
+            "id": new_template.id
         }
     elif request.method == "GET":
         template_id = request.args.get('id', None)
@@ -67,5 +64,45 @@ def card_template_get_post():
     else:
         return {"status": "failed", "message": "Request method not supported"}
 
-# @app.route("")
-# def create_card()
+@card_bp.route("/create", methods=['POST'])
+def create_card():
+    if request.method == "POST":
+        data = None
+        if request.data:
+            data = json.loads(request.data)
+        elif request.form:
+            data = request.form
+        else:
+            return {"status": "failed", "message": "No arguments given"}
+
+        if not authorized_request(data):
+            return {"status": "failed", "message": "User is not authorized to perform this action."}
+        
+        now = datetime.utcnow()
+        params = {
+            "template_id": data.get("template_id", None),
+            "owner": data.get("owner", None),
+            "date_created": now,
+            "date_received": now,
+        }
+        if params["template_id"] is None:
+            return {"status": "failed", "message": "Missing required fields 'template_id'"}
+        elif params["owner"] is None:
+            return {"status": "failed", "message": "Missing required fields 'owner'"}
+        
+        try:
+            new_card = Card(**params)
+            db.session.add(new_card)
+            db.session.commit()
+        except IntegrityError:
+            return {"status": "failed", "message": "Database IntegrityError"}
+        except OperationalError:
+            return {"status": "failed", "message": "Database OperationalError"}
+        
+        return {
+            "status": "success",
+            "message": "New card created", 
+            "id": new_card.id,
+            "owner": new_card.owner,
+            "template_id": new_card.template_id,
+        }

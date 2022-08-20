@@ -13,9 +13,6 @@ STATIC_URL = "/static"
 
 db = SQLAlchemy(app)
 
-from auth import auth as auth_blueprint
-app.register_blueprint(auth_blueprint, url_prefix="/auth")
-
 db.init_app(app)
 
 login_manager = LoginManager()

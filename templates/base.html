@@ -29,6 +29,9 @@
                                 Sign Up
                             </a>
                             {% else %}
+                            <a href="{{ url_for('profile', user=current_user.get_id()) }}" class="navbar-item">
+                                My Profile
+                            </a>
                             <a href="{{ url_for('auth.logout') }}" class="navbar-item">
                                 Logout
                             </a>
