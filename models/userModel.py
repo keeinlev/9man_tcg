@@ -11,6 +11,7 @@ class User(UserMixin, db.Model):
     timezone = db.Column(db.Integer, nullable=False, default=0)
     date_created = db.Column(db.DateTime, nullable=False)
     is_active = db.Column(db.Boolean, nullable=False, default=True)
+    is_admin = db.Column(db.Boolean, nullable=False, default=False)
     
     @property
     def is_authenticated(self):

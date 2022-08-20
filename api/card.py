@@ -1,5 +1,7 @@
 from flask import request, json
-from app import app, db, BASE_STATIC_URL as base_url
+from flask_login import current_user
+from app import app, db, BASE_URL as base_url, STATIC_URL as static_url
+from auth import validate_email_pass
 from models.cardModel import Card
 
 @app.route("/card", methods=['GET', 'POST'])
@@ -14,12 +16,17 @@ def card_get_post():
             data = request.form
         else:
             return {"status": "failed", "message": "No arguments given"}
+
+        if (data.get("email", None) is not None and data.get("password", None) is not None):
+            got_user = validate_email_pass(data.get("email", None), data.get("password", None))
+        if not ((current_user.is_authenticated and current_user.is_admin) or (got_user and got_user.is_admin)):
+            return {"status": "failed", "message": "User is not authorized to perform this action."}
         params = (
             data.get("name", None),
             data.get("team", None),
             data.get("year", 2022),
             data.get("collection", "2022 Season"),
-            data.get("image_url", base_url + "/static/images/null.png"),
+            data.get("image_url", static_url + "/images/null.png"),
             data.get("rarity", None),
         )
         if params[0] is None:

@@ -1,6 +1,6 @@
 from flask import request, json, url_for, redirect, render_template
 from flask_login import login_required
-from app import app, db, BASE_STATIC_URL as base_url
+from app import app, db, BASE_URL as base_url, STATIC_URL as static_url
 from models.userModel import User
 
 @app.route("/profile")

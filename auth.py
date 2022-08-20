@@ -9,6 +9,27 @@ from models.userModel import User
 
 auth = Blueprint('auth', __name__)
 
+def validate_email_pass(email, password):
+    """
+    Checks if email belongs to existing user and if password is correct for that user
+    Return value type -> User <Object>, None, or 0
+    Returns User object on success
+    Returns None on fail if email does not belong to a user
+    Returns 0 on fail if email belongs to user but password is not a match
+    """
+    if not email:
+        return None
+    if not password:
+        return 0
+
+    got_user = User.query.filter_by(email=email).first()
+
+    if got_user is None:
+        return None
+    if not check_password_hash(got_user.password, password):
+        return 0
+    return got_user
+
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == "GET":
@@ -22,7 +43,7 @@ def login():
         flash("Please fill in all fields")
         return redirect(url_for("auth.login"))
 
-    got_user = User.query.filter_by(email=email).first()
+    got_user = validate_email_pass(email, password)
 
     # wrong email
     if got_user is None:
@@ -30,7 +51,7 @@ def login():
         return redirect(url_for("auth.login"))
     
     # wrong password
-    if not check_password_hash(got_user.password, password):
+    if got_user == 0:
         flash("Password incorrect")
         return redirect(url_for("auth.login"))
 
@@ -59,7 +80,7 @@ def signup():
             flash("User with that email or username already exists.")
             return redirect(url_for("auth.signup"))
 
-        new_user = User(email=email, username=username, password=generate_password_hash(password, method="sha256"), timezone=local_tz, date_created=datetime.utcnow(), is_active=True)
+        new_user = User(email=email, username=username, password=generate_password_hash(password, method="sha256"), timezone=local_tz, date_created=datetime.utcnow(), is_active=True, is_admin=False)
         db.session.add(new_user)
         db.session.commit()
 
