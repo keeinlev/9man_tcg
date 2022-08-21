@@ -9,6 +9,7 @@ from app import app, db
 from api.card import *
 from api.profile import *
 from api.search import *
+from api.trade import *
 from tests import *
 from auth import *
 
@@ -17,6 +18,8 @@ from auth import auth as auth_blueprint
 app.register_blueprint(auth_blueprint, url_prefix="/auth")
 from api.card import card_bp as card_blueprint
 app.register_blueprint(card_blueprint, url_prefix="/card")
+from api.profile import profile_bp as profile_blueprint
+app.register_blueprint(profile_blueprint, url_prefix="/profile")
 
 @app.route("/")
 def home():

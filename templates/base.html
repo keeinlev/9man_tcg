@@ -37,7 +37,7 @@
                             <a href="{{ url_for('home') }}" class="navbar-item">
                                 Trade
                             </a>
-                            <a href="{{ url_for('profile', user=current_user.get_id()) }}" class="navbar-item">
+                            <a href="{{ url_for('profile.profile', user=current_user.username) }}" class="navbar-item">
                                 My Profile
                             </a>
                             <a href="{{ url_for('auth.logout') }}" class="navbar-item">

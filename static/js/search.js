@@ -13,7 +13,7 @@ async function searchUsers() {
             let date_joined = u["date_created"];
             console.log(id, username, date_joined);
 
-            s += "<div class='field'><a href='/profile?user=" + id.toString() + "'>" + username + "</a><br>Joined: " + date_joined + "</div>";
+            s += "<div class='field'><a href='/profile?user=" + username + "'>" + username + "</a><br>Joined: " + date_joined + "</div>";
             $("#search-results").html(s);
         });
         console.log(resp.data);

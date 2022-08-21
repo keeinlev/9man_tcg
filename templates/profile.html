@@ -5,16 +5,21 @@
   {{ user.username }}
 </h1>
 {% if current_user.is_authenticated %}
-    {% if current_user.id != user.id %}
-        {% if current_user.is_friends_with(user.id) %}
-            <h2>Friends since {{ current_user.friends_since(user.id) }}</h2>
-            <a class="button is-success" id="trade-with">Trade</a>
+    {% if current_user.username != user.username %}
+        {% if current_user.is_friends_with(user.username) %}
+            <h2>Friends since {{ current_user.friends_since(user.username) }}</h2>
+            <a class="button is-success" id="trade-with" href="{{ url_for('trade', other_user=user.username) }}">Trade</a>
         {% else %}
-            <a class="button is-primary" id="add-friend" {% if current_user.get_friendship(user.id) %} disabled>Friend request sent{% else %}>Send friend request{% endif %}</a>
+            <a class="button is-primary" id="add-friend" {% if current_user.get_friendship(user.username) %} disabled>Friend request sent{% else %}>Send friend request{% endif %}</a>
         {% endif %}
+    {% else %}
+        <a class="button is-primary" id="my-trades" href="{{ url_for('profile.user_trades', user=current_user.username) }}">My Trades</a>
     {% endif %}
+    {% for card in user.cards %}
+        <p>{{ card.name }}</p>
+    {% endfor %}
+    {% for pack in user.packs %}
+        <p>{{ pack.collection }}</p>
+    {% endfor %}
 {% endif %}
-{% for card in user.user_cards %}
-<p>{{ card.name }}</p>
-{% endfor %}
 {% endblock %}

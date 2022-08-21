@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% if current_user.is_authenticated %}
+<h1 class="title">Trade with {% if edit %}{{ trade.other_user(current_user.username) }}{% else %}{{ other_user.username }}{% endif %}</h1>
+<div class="columns" style="height:500px">
+    <div class="column">
+        <div class="card" style="height:100%" id="left-inventory">
+        
+        </div>
+    </div>
+    <div class="column">
+        <div class="card" style="height:100%" id="left-trade">
+        
+        </div>
+    </div>
+    <div class="column">
+        <div class="card" style="height:100%" id="right-trade">
+        
+        </div>
+    </div>
+    <div class="column">
+        <div class="card" style="height:100%" id="right-inventory">
+        
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

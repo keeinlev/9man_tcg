@@ -3,6 +3,8 @@ from werkzeug.security import generate_password_hash
 from sqlalchemy import and_, or_
 from app import db
 from models.cardModel import Card
+from models.packModel import Pack
+from models.tradeModel import Trade
 from datetime import timedelta, datetime
 from util import nth_weekday_of_month
 
@@ -16,8 +18,8 @@ from util import nth_weekday_of_month
 # ONLY ONE ROW PER FRIENDSHIP, CAN BE EITHER DIRECTION, SO CHECK BOTH WAYS WHEN GETTING FRIENDS
 class FriendshipAssoc(db.Model):
     __tablename__ = 'friendships'
-    friend_a_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
-    friend_b_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
+    friend_a = db.Column(db.String, db.ForeignKey('users.username'), primary_key=True)
+    friend_b = db.Column(db.String, db.ForeignKey('users.username'), primary_key=True)
     date_created = db.Column(db.DateTime, nullable=False)
     date_accepted = db.Column(db.DateTime)
 
@@ -60,15 +62,19 @@ class User(UserMixin, db.Model):
         return self.id
 
     @property
-    def user_cards(self):
+    def cards(self):
         return Card.query.filter_by(owner=self.username)
     
     @property
+    def packs(self):
+        return Pack.query.filter_by(owner=self.username)
+    
+    @property
     def friends(self):
-        a_friendships = FriendshipAssoc.query.filter(and_(FriendshipAssoc.friend_a_id == self.id, FriendshipAssoc.date_accepted != None)).all()
-        b_friendships = FriendshipAssoc.query.filter(and_(FriendshipAssoc.friend_b_id == self.id, FriendshipAssoc.date_accepted != None)).all()
-        a_friends = [ f.friend_b_id for f in a_friendships ]
-        b_friends = [ f.friend_a_id for f in b_friendships ]
+        a_friendships = FriendshipAssoc.query.filter(and_(FriendshipAssoc.friend_a == self.username, FriendshipAssoc.date_accepted != None)).all()
+        b_friendships = FriendshipAssoc.query.filter(and_(FriendshipAssoc.friend_b == self.username, FriendshipAssoc.date_accepted != None)).all()
+        a_friends = [ f.friend_b for f in a_friendships ]
+        b_friends = [ f.friend_a for f in b_friendships ]
         return tuple(a_friends + b_friends) # can do this b/c only have 1 row/friendship, disjoint union
     
     def is_friends_with(self, other):
@@ -77,8 +83,8 @@ class User(UserMixin, db.Model):
     def get_friendship(self, other):
         return FriendshipAssoc.query.filter(
             or_(
-                and_(FriendshipAssoc.friend_a_id == self.id, FriendshipAssoc.friend_b_id == other),
-                and_(FriendshipAssoc.friend_b_id == self.id, FriendshipAssoc.friend_a_id == other)
+                and_(FriendshipAssoc.friend_a == self.username, FriendshipAssoc.friend_b == other),
+                and_(FriendshipAssoc.friend_b == self.username, FriendshipAssoc.friend_a == other)
             )
         ).first()
     
@@ -87,3 +93,15 @@ class User(UserMixin, db.Model):
             return (self.get_friendship(other).date_accepted + timedelta(hours=self.timezone)).strftime("%B %d %Y %I:%m %p")
         else:
             return "N/A"
+    
+    @property
+    def sent_trades():
+        return Trade.query.filter(Trade.sender == self.username).order_by(Trade.accepted.asc(), Trade.date_created.desc()).all()
+
+    @property
+    def received_trades():
+        return Trade.query.filter(Trade.sender == self.username).order_by(Trade.accepted.asc(), Trade.date_created.desc()).all()
+
+    @property
+    def all_trades():
+        return Trade.query.filter(or_(Trade.sender == self.username, Trade.receiver == self.username)).order_by(Trade.accepted.asc(), Trade.date_created.desc()).all()

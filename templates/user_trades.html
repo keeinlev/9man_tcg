@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="title">My Trades</h1>
+{% if current_user.is_authenticated %}
+    {% for trade in user.trades %}
+        <p>{{ trade.name }}</p>
+    {% endfor %}
+{% endif %}
+{% endblock %}
