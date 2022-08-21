@@ -92,9 +92,9 @@ def signup():
         email = data.get("email", None)
         username = data.get("username", None)
         password = data.get("password", None)
-        local_tz = data.get("timezone", None)
+        local_tz_std = data.get("timezone", None)
 
-        if not email or not username or not password:
+        if not email or not username or not local_tz_std:
             flash("Please fill out all fields.")
             return redirect(url_for("auth.signup"))
 
@@ -103,7 +103,7 @@ def signup():
             flash("User with that email or username already exists.")
             return redirect(url_for("auth.signup"))
 
-        new_user = User(email=email, username=username, password=generate_password_hash(password, method="sha256"), timezone=local_tz, date_created=datetime.utcnow(), is_active=True, is_admin=False)
+        new_user = User(email=email, username=username, password=generate_password_hash(password, method="sha256"), timezone_std=local_tz_std, timezone_dst=local_tz_std + 1, date_created=datetime.utcnow(), is_active=True, is_admin=False)
         db.session.add(new_user)
         db.session.commit()
 

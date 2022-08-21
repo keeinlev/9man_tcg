@@ -61,9 +61,12 @@
 
 </html>
 <script>
+    var jan = new Date(this.getFullYear(), 0, 1);
+    var jul = new Date(this.getFullYear(), 6, 1);
     var t = new Date();
+    var stdTzOffset = Math.max(jan.getTimezoneOffset(), jul.getTimezoneOffset());
     $("#time").val(t);
-    $("#timezone").val(t.getTimezoneOffset() / 60)
+    $("#timezone").val(0 - stdTzOffset / 60)
 </script>
 {% block footer %}
 {% endblock %}

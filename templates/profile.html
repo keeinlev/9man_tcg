@@ -1,14 +1,20 @@
 {% extends "base.html" %}
 
 {% block content %}
-{% if current_user.is_authenticated %}
 <h1 class="title">
   {{ user.username }}
 </h1>
+{% if current_user.is_authenticated %}
+    {% if current_user.id != user.id %}
+        {% if current_user.is_friends_with(user.id) %}
+            <h2>Friends since {{ current_user.friends_since(user.id) }}</h2>
+            <a class="button is-success" id="trade-with">Trade</a>
+        {% else %}
+            <a class="button is-primary" id="add-friend" {% if current_user.get_friendship(user.id) %} disabled>Friend request sent{% else %}>Send friend request{% endif %}</a>
+        {% endif %}
+    {% endif %}
+{% endif %}
 {% for card in user.user_cards %}
 <p>{{ card.name }}</p>
 {% endfor %}
-{% else %}
-<a href="{{ url_for('home') }}">Go Home</a>
-{% endif %}
 {% endblock %}
