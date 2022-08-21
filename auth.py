@@ -31,6 +31,7 @@ def validate_email_pass(email, password):
     if not password:
         return 0
 
+    email = email.lower()
     got_user = User.query.filter_by(email=email).first()
 
     if got_user is None:
@@ -63,6 +64,7 @@ def login():
         flash("Please fill in all fields")
         return redirect(url_for("auth.login"))
 
+    email = email.lower()
     got_user = validate_email_pass(email, password)
 
     # wrong email
@@ -76,7 +78,7 @@ def login():
         return redirect(url_for("auth.login"))
 
     login_user(got_user, remember=remember)
-    return redirect("/")
+    return redirect(url_for('home'))
 
 @auth.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -96,6 +98,7 @@ def signup():
             flash("Please fill out all fields.")
             return redirect(url_for("auth.signup"))
 
+        email = email.lower()
         if User.query.filter(or_(User.email == email, User.username == username)).first() is not None:
             flash("User with that email or username already exists.")
             return redirect(url_for("auth.signup"))

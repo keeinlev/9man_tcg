@@ -1,0 +1,25 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keeinlev/9man_tcg.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/keeinlev/9man_tcg/issues"
+  },
+  "homepage": "https://github.com/keeinlev/9man_tcg#readme",
+  "dependencies": {
+    "axios": "^0.27.2",
+    "browserify-shim": "^3.8.15",
+    "save": "^2.5.0"
+  }
+}

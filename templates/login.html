@@ -40,7 +40,7 @@
             <button class="button is-block is-info is-large is-fullwidth">Login</button>
         </form>
         {% else %}
-        <a href="/"><u>Go Home</u></a>
+        <a href="{{ url_for('home') }}"><u>Go Home</u></a>
         {% endif %}
     </div>
 </div>

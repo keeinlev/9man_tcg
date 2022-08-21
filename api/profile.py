@@ -10,14 +10,14 @@ def profile():
         user_id = request.args.get("user", None)
         if user_id is None:
             flash("Error while trying to access user profile.")
-            return redirect("/")
+            return redirect(url_for('home'))
 
         got_user = User.query.get(user_id)
         if got_user:
             return render_template("profile.html", user=got_user)
         else:
             flash("User not found")
-            return redirect("/")
+            return redirect(url_for('home'))
     else:
         flash("Invalid method")
-        return redirect("/")
+        return redirect(url_for('home'))

@@ -12,6 +12,8 @@
         </div>
     {% endif %}
     {% endwith %}
+    {% if not current_user.is_authenticated %}
     <u><a href="{{ url_for('auth.signup') }}">Sign up now</a></u>
+    {% endif %}
 </h2>
 {% endblock %}

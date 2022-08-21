@@ -9,6 +9,6 @@
 <p>{{ card.name }}</p>
 {% endfor %}
 {% else %}
-<a href="/">Go Home</a>
+<a href="{{ url_for('home') }}">Go Home</a>
 {% endif %}
 {% endblock %}

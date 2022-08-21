@@ -6,6 +6,7 @@ from models.tradeModel import Trade
 from app import app, db
 from api.card import *
 from api.profile import *
+from api.search import *
 from auth import *
 
 db.create_all()
